@@ -1,7 +1,8 @@
 import math
 import secrets
+import textwrap
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 # Character classes available
 CHAR_CLASSES = {
@@ -18,6 +19,11 @@ class PasswordArguments:
     included_classes: List[str]
     exact_counts: Dict[str, int]
 
+    def __str__(self) -> str:
+        return f"""Length: {self.length}
+Included Classes: {self.included_classes}
+Exact Count: {self.exact_counts}"""
+
 
 def multinomial_coefficient(counts: List[int]) -> int:
     """Compute multinomial coefficient: L! / (k1! * k2! * ... * km!)."""
@@ -29,6 +35,11 @@ def multinomial_coefficient(counts: List[int]) -> int:
     return numer // denom
 
 
+def check_if_exact_exceed(length: int, req_sum: int) -> None:
+    if req_sum > length:
+        raise ValueError("Sum of exact counts exceeds password length.")
+
+
 def calculate_search_space(ps_args: PasswordArguments) -> int:
     """
     Calculate the total number of possible passwords (search space N).
@@ -36,51 +47,51 @@ def calculate_search_space(ps_args: PasswordArguments) -> int:
     - included_classes: list of allowed character classes
     - exact_counts: mapping like {"digits": 2}
     """
-    L = ps_args.length
-    req_sum = sum(ps_args.exact_counts.values())
-    if req_sum > L:
-        raise ValueError("Sum of exact counts exceeds password length.")
+    L: int = ps_args.length
+    req_sum: int = sum(ps_args.exact_counts.values())
+    check_if_exact_exceed(L, req_sum)
 
-    sizes = {k: len(CHAR_CLASSES[k]) for k in ps_args.included_classes}
-    r = L - req_sum  # remaining positions
+    sizes: Dict[str, int] = {k: len(CHAR_CLASSES[k]) for k in ps_args.included_classes}
+    r: int = L - req_sum  # remaining positions
 
     # classes allowed to fill the remaining positions
-    other_classes = [
+    other_classes: List[str] = [
         c for c in ps_args.included_classes if c not in ps_args.exact_counts
     ]
-    C_other = sum(sizes[c] for c in other_classes) if other_classes else 0
+
+    C_other: int = sum(sizes[c] for c in other_classes) if other_classes else 0
 
     if r > 0 and C_other == 0:
         return 0  # impossible
 
     # multinomial placement ways
-    counts_vector = list(ps_args.exact_counts.values()) + [r]
-    place_ways = multinomial_coefficient(counts_vector)
+    counts_vector: List[int] = list(ps_args.exact_counts.values()) + [r]
+    place_ways: int = multinomial_coefficient(counts_vector)
 
     # fill choices for required positions
-    required_fill = 1
+    required_fill: int = 1
     for cls, k in ps_args.exact_counts.items():
         required_fill *= sizes[cls] ** k
 
     # fill choices for remaining positions
-    other_fill = (C_other**r) if r > 0 else 1
+    other_fill: int = (C_other**r) if r > 0 else 1
 
     return place_ways * required_fill * other_fill
 
 
 def generate_password(ps_args: PasswordArguments) -> str:
     """Generate a password that satisfies exact constraints."""
-    L = ps_args.length
-    req_sum = sum(ps_args.exact_counts.values())
-    if req_sum > L:
-        raise ValueError("Sum of exact counts exceeds password length.")
+    L: int = ps_args.length
+    req_sum: int = sum(ps_args.exact_counts.values())
+    check_if_exact_exceed(L, req_sum)
 
-    other_classes = [
+    other_classes: List[str] = [
         c for c in ps_args.included_classes if c not in ps_args.exact_counts
     ]
-    other_pool = "".join(CHAR_CLASSES[c] for c in other_classes)
 
-    chars = []
+    other_pool: str = "".join(CHAR_CLASSES[c] for c in other_classes)
+
+    chars: List[str] = []
 
     # Add required characters
     for cls, k in ps_args.exact_counts.items():
@@ -88,7 +99,8 @@ def generate_password(ps_args: PasswordArguments) -> str:
             chars.append(secrets.choice(CHAR_CLASSES[cls]))
 
     # Fill the remaining
-    r = L - req_sum
+    r: int = L - req_sum
+
     for _ in range(r):
         chars.append(secrets.choice(other_pool))
 
@@ -99,9 +111,7 @@ def generate_password(ps_args: PasswordArguments) -> str:
 
 def entropy_bits(N: int) -> float:
     """Compute entropy (bits)."""
-    if N <= 0:
-        return 0.0
-    return math.log2(N)
+    return math.log2(N) if N > 0 else 0.0
 
 
 def print_report(
@@ -110,16 +120,14 @@ def print_report(
     entropy_bits: float,
     generated_pw: str,
 ) -> None:
-    print(f"Length: {ps_args.length}")
-    print(f"Included classes: {ps_args.included_classes}")
-    print(f"Exact counts: {ps_args.exact_counts}")
+    print(ps_args)
     print(f"Search space (N): {search_space:,}")
     print(f"Entropy: {entropy_bits:.2f} bits")
     print(f"Sample password: {generated_pw}")
 
 
 def __example() -> None:
-    print("Example Run:\n")
+    print("Example Run:")
 
     ps_args: PasswordArguments = PasswordArguments(
         8, ["lower", "upper", "digits"], {"digits": 2}
