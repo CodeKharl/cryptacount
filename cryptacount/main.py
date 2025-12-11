@@ -1,7 +1,37 @@
-import argparse
+from argparse import ArgumentParser, Namespace
 from typing import Dict, List
 
 import password_generator
+
+
+def __create_parser() -> ArgumentParser:
+    parser: ArgumentParser = ArgumentParser(
+        description="CryptoCount: Password Entropy Analyzer"
+    )
+
+    parser.add_argument("--length", type=int, help="Password length", required=True)
+    parser.add_argument(
+        "--include",
+        nargs="+",
+        help="Character classes [lower, upper, digits, symbols]",
+        required=True,
+    )
+    parser.add_argument(
+        "--exact",
+        nargs="*",
+        default=[],
+        help="Exact counts (e.g., digits=1, symbols=2)",
+    )
+
+    return parser
+
+
+def __create_password_args(args: Namespace) -> password_generator.PasswordArguments:
+    length: int = args.length
+    included: List[str] = args.include
+    exact: Dict[str, int] = __parse_exact_constrains(args.exact)
+
+    return password_generator.PasswordArguments(length, included, exact)
 
 
 def __parse_exact_constrains(exact_args: List[str]) -> Dict[str, int]:
@@ -22,35 +52,17 @@ def __parse_exact_constrains(exact_args: List[str]) -> Dict[str, int]:
 
 
 def __main() -> None:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="CryptoCount: Password Entropy Analyzer"
-    )
+    parser: ArgumentParser = __create_parser()
 
-    parser.add_argument("--length", type=int, help="Password length", required=True)
-    parser.add_argument(
-        "--include",
-        nargs="+",
-        help="Character classes [lower, upper, digits, symbols]",
-        required=True,
-    )
-    parser.add_argument(
-        "--exact",
-        nargs="*",
-        default=[],
-        help="Exact counts (e.g., digits=1, symbols=2)",
-    )
+    args: Namespace = parser.parse_args()
 
-    args: argparse.Namespace = parser.parse_args()
+    pw_args: password_generator.PasswordArguments = __create_password_args(args)
 
-    length: int = args.length
-    included: List[str] = args.include
-    exact: Dict[str, int] = __parse_exact_constrains(args.exact)
+    search_space: int = password_generator.calculate_search_space(pw_args)
+    entropy_bits: float = password_generator.entropy_bits(search_space)
+    generated_pw: str = password_generator.generate_password(pw_args)
 
-    generated_password: str = password_generator.generate_password(
-        length, included, exact
-    )
-
-    print("Generated Password:", generated_password)
+    password_generator.print_report(pw_args, search_space, entropy_bits, generated_pw)
 
 
 if __name__ == "__main__":
