@@ -6,7 +6,7 @@ import password_generator
 
 def __create_parser() -> ArgumentParser:
     parser: ArgumentParser = ArgumentParser(
-        description="CryptoCount: Password Entropy Analyzer"
+        description="CryptaCount: Password Entropy Analyzer"
     )
 
     parser.add_argument("--length", type=int, help="Password length", required=True)
