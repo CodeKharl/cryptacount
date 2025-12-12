@@ -1,8 +1,7 @@
 import math
 import secrets
-import textwrap
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 # Character classes available
 CHAR_CLASSES = {
@@ -104,7 +103,6 @@ def generate_password(ps_args: PasswordArguments) -> str:
     for _ in range(r):
         chars.append(secrets.choice(other_pool))
 
-    # Shuffle to create a permutation
     secrets.SystemRandom().shuffle(chars)
     return "".join(chars)
 
