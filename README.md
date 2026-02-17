@@ -1,9 +1,7 @@
----
-
 # 📘 CryptaCount: Discrete Password Entropy Analyzer
 
 **CryptaCount** is a Python-based tool that analyzes password strength using **Discrete Mathematics**—specifically **Permutations, Combinations, and the Rule of Product**.
-It computes the password search space, entropy (bits), and generates a valid random password that satisfies exact character-type constraints (e.g., *exactly 2 digits*).
+It computes the password search space, entropy (bits), and generates a valid random password that satisfies exact character-type constraints (e.g., _exactly 2 digits_).
 
 This tool was created for **CS 211 – Discrete Structure 2** as a demonstration of applying counting principles in real-world security.
 
@@ -11,14 +9,14 @@ This tool was created for **CS 211 – Discrete Structure 2** as a demonstration
 
 ## 🔧 Features
 
-* Calculates password **search space** (N) using counting principles
-* Computes **entropy** in bits (log₂ N)
-* Supports character constraints (e.g., *must contain exactly k digits*)
-* Uses **multinomial coefficients & combinations**
-* Generates a valid random password
-* Handles impossible constraints safely
-* Supports **command-line arguments**
-* Uses cryptographically secure random generation
+- Calculates password **search space** (N) using counting principles
+- Computes **entropy** in bits (log₂ N)
+- Supports character constraints (e.g., _must contain exactly k digits_)
+- Uses **multinomial coefficients & combinations**
+- Generates a valid random password
+- Handles impossible constraints safely
+- Supports **command-line arguments**
+- Uses cryptographically secure random generation
 
 ---
 
@@ -63,9 +61,9 @@ python cryptacount.py
 
 It will use the built-in example:
 
-* Length: 8
-* Included classes: lower, upper, digits
-* Exact requirement: 2 digits
+- Length: 8
+- Included classes: lower, upper, digits
+- Exact requirement: 2 digits
 
 ---
 
@@ -140,11 +138,10 @@ python cryptacount.py --length 8 --include lower
 3. (Optional) Add exact count requirements
 4. Run the program
 5. The output will include:
-
-   * Search space (N)
-   * Entropy (bits)
-   * Secure sample password
-   * All computation steps are based on discrete math counting rules
+   - Search space (N)
+   - Entropy (bits)
+   - Secure sample password
+   - All computation steps are based on discrete math counting rules
 
 ---
 
@@ -158,18 +155,18 @@ N = (L! / (k1! k2! ... km! (L − Σki)!))
 
 Where:
 
-* **L** = password length
-* **ki** = required counts
-* **Ci** = class sizes
-* **Cother** = allowed characters for filler positions
+- **L** = password length
+- **ki** = required counts
+- **Ci** = class sizes
+- **Cother** = allowed characters for filler positions
 
 ---
 
 # 🔐 Security Notes
 
-* Uses Python’s `secrets` module
-* Strong randomness (SystemRandom)
-* Designed for educational and academic demonstration
+- Uses Python’s `secrets` module
+- Strong randomness (SystemRandom)
+- Designed for educational and academic demonstration
 
 ---
 
