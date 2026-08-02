@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from typing import Dict, List
 
-import password_generator
+from cryptacount import password_generator
 
 
 def __create_parser() -> ArgumentParser:
